@@ -1,0 +1,139 @@
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: visor_i2d_db
+    environment:
+      - POSTGRES_DB=i2d_db
+      - POSTGRES_USER=i2d_user
+      - POSTGRES_PASSWORD=i2d_password
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - visor_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U i2d_user -d i2d_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Django)
+  backend:
+    build:
+      context: ./visor-geografico-I2D-backend
+      dockerfile: Dockerfile
+    container_name: visor_i2d_backend
+    command: >
+      sh -c "python manage.py collectstatic --noinput &&
+             python manage.py migrate &&
+             gunicorn i2dbackend.wsgi --bind 0.0.0.0:8001 --workers 3"
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./visor-geografico-I2D-backend:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    environment:
+      - DEBUG=0
+      - DB_HOST=db
+      - DB_NAME=i2d_db
+      - DB_USER=i2d_user
+      - DB_PASSWORD=i2d_password
+      - DB_PORT=5432
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - SECRET_KEY=your-secret-key-here-change-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - visor_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/admin/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend (Node.js build + Nginx serve)
+  frontend:
+    build:
+      context: ./visor-geografico-I2D
+      dockerfile: Dockerfile
+      target: production
+    container_name: visor_i2d_frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./visor-geografico-I2D/build:/usr/local/apache2/htdocs/
+    depends_on:
+      - backend
+    networks:
+      - visor_network
+    environment:
+      - BACKEND_URL=http://backend:8001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: visor_i2d_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/var/www/static
+      - media_volume:/var/www/media
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - visor_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching (optional but recommended)
+  redis:
+    image: redis:7-alpine
+    container_name: visor_i2d_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - visor_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  visor_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

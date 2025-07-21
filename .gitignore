@@ -1,0 +1,234 @@
+# Visor-I2D Unified Repository .gitignore
+
+# ============================================================================
+# SUBMODULE PROJECTS (managed separately)
+# ============================================================================
+# Exclude the actual submodule content - Git will track them as submodules
+visor-geografico-I2D/
+visor-geografico-I2D-backend/
+
+# ============================================================================
+# DOCKER & CONTAINERS
+# ============================================================================
+# Docker volumes and data
+postgres_data/
+redis_data/
+static_volume/
+media_volume/
+
+# Docker logs
+docker-compose.override.yml
+.docker/
+
+# ============================================================================
+# DATABASE & BACKUPS
+# ============================================================================
+# Database backups
+backups/*.sql
+backups/*.dump
+backups/*.tar.gz
+
+# Keep the backups directory but ignore contents
+backups/*
+!backups/.gitkeep
+
+# ============================================================================
+# LOGS & TEMPORARY FILES
+# ============================================================================
+# Application logs
+logs/*.log
+logs/*.out
+logs/*.err
+
+# Keep logs directory but ignore contents
+logs/*
+!logs/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ============================================================================
+# ENVIRONMENT & SECRETS
+# ============================================================================
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.staging
+
+# Secret files
+secret.json
+secrets/
+*.key
+*.pem
+*.crt
+*.p12
+
+# ============================================================================
+# IDE & EDITOR FILES
+# ============================================================================
+# Visual Studio Code
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
+.vscode/.ropeproject
+
+# Keep workspace file
+!.vscode/workspace.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================================================
+# OPERATING SYSTEM FILES
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================================
+# SSL CERTIFICATES
+# ============================================================================
+# SSL certificates and keys
+nginx/ssl/*.crt
+nginx/ssl/*.key
+nginx/ssl/*.pem
+nginx/ssl/*.p12
+ssl/
+certs/
+
+# ============================================================================
+# DEVELOPMENT & TESTING
+# ============================================================================
+# Test coverage
+coverage/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.pytest_cache/
+.cache/
+
+# Node modules (if any local development)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ============================================================================
+# MONITORING & ANALYTICS
+# ============================================================================
+# Monitoring data
+prometheus/
+grafana/
+elasticsearch/
+kibana/
+
+# ============================================================================
+# CUSTOM PROJECT FILES
+# ============================================================================
+# Custom configuration overrides
+config/local.yml
+config/development.yml
+config/production.yml
+
+# Data files
+data/
+uploads/
+downloads/
+
+# Documentation builds
+docs/_build/
+site/
+
+# ============================================================================
+# KEEP IMPORTANT DIRECTORIES
+# ============================================================================
+# Keep important empty directories
+!scripts/.gitkeep
+!nginx/.gitkeep
+!backups/.gitkeep
+!logs/.gitkeep

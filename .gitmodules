@@ -1,0 +1,9 @@
+[submodule "visor-geografico-I2D"]
+	path = visor-geografico-I2D
+	url = https://github.com/PEM-Humboldt/visor-geografico-I2D.git
+	branch = main
+
+[submodule "visor-geografico-I2D-backend"]
+	path = visor-geografico-I2D-backend
+	url = https://github.com/PEM-Humboldt/visor-geografico-I2D-backend.git
+	branch = main
