@@ -12,7 +12,7 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./scripts/init-db-schema.sql:/docker-entrypoint-initdb.d/init-db.sql
     ports:
       - "5432:5432"
     networks:
@@ -36,7 +36,8 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - ./visor-geografico-I2D-backend:/app
+      - ./visor-geografico-I2D-backend:/project
+      - ./visor-geografico-I2D-backend/secret.json:/project/secret.json
       - static_volume:/app/static
       - media_volume:/app/media
     environment:
@@ -46,7 +47,7 @@ services:
       - DB_USER=i2d_user
       - DB_PASSWORD=i2d_password
       - DB_PORT=5432
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,0.0.0.0
       - SECRET_KEY=your-secret-key-here-change-in-production
     depends_on:
       db:
@@ -110,7 +111,7 @@ services:
     image: redis:7-alpine
     container_name: visor_i2d_redis
     ports:
-      - "6379:6379"
+      - "6381:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -136,4 +137,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16
+        - subnet: 172.25.0.0/16
