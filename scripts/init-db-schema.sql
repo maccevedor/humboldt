@@ -27,3 +27,13 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA geovisor GRANT ALL ON SEQUENCES TO i2d_user;
 
 -- Set search path for the user
 ALTER USER i2d_user SET search_path = django,gbif_consultas,capas_base,geovisor,public;
+
+
+-- Connect to your PostgreSQL database and run this SQL
+-- This creates the gbif_info table in the gbif_consultas schema
+
+CREATE TABLE IF NOT EXISTS gbif_consultas.gbif_info (
+    id SERIAL PRIMARY KEY,
+    download_date DATE NOT NULL,
+    doi TEXT
+);

@@ -158,6 +158,12 @@ docker-compose ps
 curl http://localhost/health          # ✅ Nginx
 curl http://localhost:8001/admin/     # ✅ Backend
 curl http://localhost:8080/           # ✅ Frontend
+
+# Verificar API GBIF
+curl http://localhost:8001/api/gbif/gbifinfo  # ✅ GBIF API
+
+# Verificar archivos estáticos del admin
+curl -I http://localhost:8001/static/admin/css/base.css  # ✅ Admin CSS
 ```
 
 ---
@@ -227,7 +233,10 @@ docker exec -it visor_i2d_backend python manage.py createsuperuser
 
 ### 🔑 Credenciales por Defecto
 - **Usuario**: `admin`
+- **Email**: `admin@humboldt.gov.co`
 - **Contraseña**: `admin123`
+
+> **Nota de Seguridad**: Para uso en producción, cambia estas credenciales por defecto y usa contraseñas más seguras.
 
 ### 📡 APIs y Endpoints
 | Endpoint | Descripción |
@@ -245,6 +254,23 @@ docker exec -it visor_i2d_db psql -U i2d_user -d i2d_db
 # Conexión externa
 psql -h localhost -p 5432 -U i2d_user -d i2d_db
 ```
+
+#### 🗂️ Esquemas de Base de Datos
+El sistema utiliza múltiples esquemas PostgreSQL para organizar los datos:
+
+| Esquema | Propósito | Descripción |
+|---------|-----------|-------------|
+| `django` | Framework | Tablas de Django (usuarios, sesiones, etc.) |
+| `gbif_consultas` | GBIF | Datos de consultas GBIF y metadatos |
+| `capas_base` | GIS | Capas geográficas base |
+| `geovisor` | Aplicación | Datos específicos del geovisor |
+
+#### 🌐 Endpoints GBIF
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/api/gbif/gbifinfo` | GET | Información de descargas GBIF |
+
+> **Nota**: La tabla `gbif_info` debe crearse manualmente ya que el modelo está marcado como `managed = False`.
 
 ---
 
@@ -338,6 +364,8 @@ curl http://localhost/health
 
 ## 🐛 Troubleshooting
 
+> **🔧 Actualizaciones Recientes**: Se han corregido problemas relacionados con la tabla `gbif_info` faltante y la creación de usuarios administradores. Ver secciones específicas abajo.
+
 ### ❗ Problemas Comunes
 
 #### Servicios no inician
@@ -367,6 +395,45 @@ netstat -tlnp | grep :5432
 docker-compose restart db
 ./scripts/db-setup.sh migrate
 ```
+
+#### Error "relation 'gbif_info' does not exist"
+Si encuentras el error `ProgrammingError: relation "gbif_info" does not exist`, necesitas crear la tabla manualmente:
+
+```bash
+# Crear tabla gbif_info en el esquema correcto
+docker exec visor_i2d_db psql -U i2d_user -d i2d_db -c "CREATE TABLE IF NOT EXISTS gbif_consultas.gbif_info (id SERIAL PRIMARY KEY, download_date DATE NOT NULL, doi TEXT);"
+
+# Verificar que la tabla fue creada
+docker exec visor_i2d_db psql -U i2d_user -d i2d_db -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'gbif_consultas' AND table_name = 'gbif_info';"
+```
+
+#### Crear usuario administrador
+Si no puedes acceder al panel de administración Django:
+
+```bash
+# Crear superusuario usando el script
+./db-setup.sh superuser
+
+# O crear manualmente
+docker exec visor_i2d_backend python manage.py createsuperuser --username admin --email admin@humboldt.gov.co --noinput
+docker exec visor_i2d_backend python manage.py shell -c "from django.contrib.auth import get_user_model; User = get_user_model(); admin = User.objects.get(username='admin'); admin.set_password('admin123'); admin.save(); print('Password set successfully')"
+```
+
+#### Error 404 en archivos CSS/JS del admin (static files)
+Si el panel de administración aparece sin estilos y con errores 404 en `/static/admin/css/base.css`:
+
+```bash
+# Verificar que los archivos estáticos estén recolectados
+docker exec visor_i2d_backend python manage.py collectstatic --noinput
+
+# Reiniciar el backend para aplicar cambios en URLs
+docker-compose restart backend
+
+# Verificar que los archivos se sirven correctamente
+curl -I http://0.0.0.0:8001/static/admin/css/base.css
+```
+
+> **Nota**: Este problema se resuelve añadiendo el servicio de archivos estáticos en las URLs de Django para modo desarrollo. El fix ya está aplicado en el código.
 
 ### 🆘 Comandos de Emergencia
 
@@ -435,6 +502,36 @@ Ver **[UPGRADE_STRATEGY.md](UPGRADE_STRATEGY.md)** para detalles completos.
 
 ---
 
+## 📝 Changelog
+
+### 🔧 Correcciones Recientes (2025-01-22)
+
+#### Problemas Resueltos:
+- ✅ **Error "relation 'gbif_info' does not exist"**: Creada tabla `gbif_info` en esquema `gbif_consultas`
+- ✅ **Admin user missing**: Configurado usuario administrador por defecto
+- ✅ **GBIF API endpoint**: Endpoint `/api/gbif/gbifinfo` ahora funcional
+- ✅ **Django admin static files 404**: Configurado servicio de archivos estáticos en desarrollo
+- ✅ **Database schema documentation**: Documentados esquemas PostgreSQL múltiples
+
+#### Comandos Agregados:
+```bash
+# Crear tabla GBIF manualmente
+docker exec visor_i2d_db psql -U i2d_user -d i2d_db -c "CREATE TABLE IF NOT EXISTS gbif_consultas.gbif_info (id SERIAL PRIMARY KEY, download_date DATE NOT NULL, doi TEXT);"
+
+# Crear usuario administrador
+./db-setup.sh superuser
+
+# Verificar archivos estáticos del admin
+curl -I http://0.0.0.0:8001/static/admin/css/base.css
+```
+
+#### Credenciales Actualizadas:
+- **Usuario**: `admin`
+- **Email**: `admin@humboldt.gov.co`
+- **Contraseña**: `admin123`
+
+---
+
 ## 📄 Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para detalles.
@@ -467,3 +564,69 @@ Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE.md
 [![Instituto Humboldt](https://img.shields.io/badge/Instituto-Humboldt-green?style=for-the-badge)](http://www.humboldt.org.co)
 
 </div>
+
+
+Available API Endpoints:
+Admin Interface:
+http://0.0.0.0:8001/admin/ - Django admin panel
+Department (Dpto) APIs:
+http://0.0.0.0:8001/api/dpto/charts/[kid] - Department charts (replace [kid] with an ID)
+http://0.0.0.0:8001/api/dpto/dangerCharts/[kid] - Department danger charts
+Municipality (Mpio) APIs:
+http://0.0.0.0:8001/api/mpio/charts/[kid] - Municipality charts
+http://0.0.0.0:8001/api/mpio/dangerCharts/[kid] - Municipality danger charts
+http://0.0.0.0:8001/api/mpio/search/[kword] - Municipality search (replace [kword] with search term)
+GBIF API:
+http://0.0.0.0:8001/api/gbif/gbifinfo - GBIF information endpoint
+Request API:
+http://0.0.0.0:8001/api/requestcreate/ - Request creation endpoint
+Quick Test URLs:
+Start with the admin: http://0.0.0.0:8001/admin/
+Test GBIF info: http://0.0.0.0:8001/api/gbif/gbifinfo
+Test search with a keyword: http://0.0.0.0:8001/api/mpio/search/test
+The root path (/) returns a 404 because there's no endpoint defined for it, which is normal for an API-only backend.
+
+Try accessing these URLs in your browser to test that the backend is working properly. The admin interface should be particularly useful for testing authentication and database connectivity.
+
+Great work! The Django backend is now fully functional and accessible. The DisallowedHost error has been completely resolved by fixing the Docker volume mapping issue.
+
+Summary of What Was Fixed:
+Root Cause: Docker volume mapping inconsistency - code was mounted to /app but Django was running from /project
+Solution: Updated
+docker-compose.yml
+ to mount ./visor-geografico-I2D-backend:/project
+Result: Django can now read the updated
+prod.py
+ with correct ALLOWED_HOSTS settings
+Your Backend is Now Working!
+The API is accessible at http://0.0.0.0:8001 with these endpoints:
+
+Admin Panel: http://0.0.0.0:8001/admin/
+GBIF Info: http://0.0.0.0:8001/api/gbif/gbifinfo
+Search: http://0.0.0.0:8001/api/mpio/search/[keyword]
+Charts: http://0.0.0.0:8001/api/dpto/charts/[id] or http://0.0.0.0:8001/api/mpio/charts/[id]
+The 404 error you're seeing at the root path (/) is normal - this is an API backend without a root endpoint defined. Try the admin panel or GBIF info endpoint to verify everything is working correctly.
+
+Your Django backend is now ready for use! 🚀
+
+
+Admin Access Credentials
+
+You can now access the Django admin interface at `http://0.0.0.0:8001/admin/` with these credentials:
+
+- **Username:** `admin`
+- **Email:** `admin@humboldt.gov.co`
+- **Password:** `admin123`
+
+## What was created:
+✅ Django superuser with admin privileges
+✅ User has staff permissions (can access admin interface)
+✅ User has superuser permissions (full admin access)
+
+## Security Note:
+For production use, you should:
+1. Change the password to something more secure
+2. Use a real email address
+3. Consider creating additional users with more limited permissions
+
+The admin interface should now be fully accessible, and you'll be able to manage users, view and edit your models (including the GBIF data once you add some), and perform other administrative tasks.
