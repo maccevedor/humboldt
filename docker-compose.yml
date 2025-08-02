@@ -106,6 +106,18 @@ services:
       timeout: 10s
       retries: 3
 
+  geoserver:
+    image: oscarfonts/geoserver:latest
+    container_name: geoserver
+    ports:
+      - "8081:8080"
+    environment:
+      - GEOSERVER_ADMIN_PASSWORD=geoserver
+    volumes:
+      - geoserver_data:/var/geoserver_data
+    networks:
+      - visor_network
+
   # Redis for caching (optional but recommended)
   redis:
     image: redis:7-alpine
@@ -130,6 +142,8 @@ volumes:
   media_volume:
     driver: local
   redis_data:
+    driver: local
+  geoserver_data:
     driver: local
 
 networks:
