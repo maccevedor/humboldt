@@ -37,3 +37,70 @@ CREATE TABLE IF NOT EXISTS gbif_consultas.gbif_info (
     download_date DATE NOT NULL,
     doi TEXT
 );
+
+
+CREATE TABLE dpto_amenazas (
+                               id serial PRIMARY KEY,
+                               codigo varchar(5),
+                               tipo varchar(1),
+                               amenazadas bigint,
+                               geom text,
+                               nombre varchar(254)
+);
+
+CREATE TABLE dpto_queries (
+                              id serial PRIMARY KEY,
+                              codigo varchar(5),
+                              tipo text,
+                              registers bigint,
+                              species bigint,
+                              exoticas bigint,
+                              endemicas bigint,
+                              geom text,
+                              nombre varchar(254)
+);
+
+CREATE TABLE mpio_amenazas (
+                               id serial PRIMARY KEY,
+                               codigo varchar(5),
+                               tipo varchar(1),
+                               amenazadas bigint,
+                               geom text,
+                               nombre varchar(254)
+);
+
+
+CREATE TABLE mpio_queries (
+                              id serial PRIMARY KEY,
+                              codigo varchar(5),
+                              tipo text,
+                              registers bigint,
+                              species bigint,
+                              exoticas bigint,
+                              endemicas bigint,
+                              geom text,
+                              nombre varchar(254)
+);
+
+
+CREATE TABLE mpio_politico (
+    gid SERIAL PRIMARY KEY,
+    dpto_ccdgo VARCHAR(2),
+    mpio_ccdgo VARCHAR(3),
+    mpio_cnmbr VARCHAR(60),
+    mpio_crslc VARCHAR(60),
+    mpio_narea NUMERIC(20, 10),
+    mpio_ccnct VARCHAR(5),
+    mpio_nano BIGINT,
+    dpto_cnmbr VARCHAR(250),
+    shape_area NUMERIC(20, 10),
+    shape_len NUMERIC(20, 10),
+    orig_fid BIGINT,
+    geom TEXT,
+    -- If you want to add the fields from the simplified model:
+    codigo VARCHAR(5),
+    dpto_nombre VARCHAR(254),
+    nombre VARCHAR(254),
+    area_ha NUMERIC(20, 10),
+    coord_central TEXT
+);

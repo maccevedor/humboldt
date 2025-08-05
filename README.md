@@ -630,3 +630,5 @@ For production use, you should:
 3. Consider creating additional users with more limited permissions
 
 The admin interface should now be fully accessible, and you'll be able to manage users, view and edit your models (including the GBIF data once you add some), and perform other administrative tasks.
+
+Instala dependencias de Python (probablemente con pip install -r requirements.txt).

@@ -64,21 +64,25 @@ services:
   frontend:
     build:
       context: ./visor-geografico-I2D
-      dockerfile: Dockerfile
-      target: production
+      dockerfile: DockerfileDev
+      target: dev
     container_name: visor_i2d_frontend
     ports:
       - "8080:80"
+      - "1234:1234"
     volumes:
-      - ./visor-geografico-I2D/build:/usr/local/apache2/htdocs/
+      # - ./visor-geografico-I2D/build:/usr/local/apache2/htdocs/
+      - ./visor-geografico-I2D:/home/node/app
     depends_on:
       - backend
     networks:
       - visor_network
     environment:
-      - BACKEND_URL=http://backend:8001
+      # - BACKEND_URL=http://backend:8001
+      - NODE_ENV=development
+      - PYTHONSERVER=http://localhost:8001/api/
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s
       timeout: 10s
       retries: 3
