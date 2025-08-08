@@ -6,6 +6,7 @@
 # Exclude the actual submodule content - Git will track them as submodules
 visor-geografico-I2D/
 visor-geografico-I2D-backend/
+datosgs/*
 
 # ============================================================================
 # DOCKER & CONTAINERS

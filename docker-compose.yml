@@ -30,7 +30,8 @@ services:
       dockerfile: Dockerfile
     container_name: visor_i2d_backend
     command: >
-      sh -c "python manage.py collectstatic --noinput &&
+      sh -c "pip install unidecode &&
+             python manage.py collectstatic --noinput &&
              python manage.py migrate &&
              gunicorn i2dbackend.wsgi --bind 0.0.0.0:8001 --workers 3"
     ports:
@@ -119,6 +120,7 @@ services:
       - GEOSERVER_ADMIN_PASSWORD=geoserver
     volumes:
       - geoserver_data:/var/geoserver_data
+      - ./datosgs:/var/lib/geoserver_data
     networks:
       - visor_network
 

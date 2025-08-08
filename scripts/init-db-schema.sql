@@ -104,3 +104,12 @@ CREATE TABLE mpio_politico (
     area_ha NUMERIC(20, 10),
     coord_central TEXT
 );
+
+
+ALTER TABLE mpio_politico
+    ADD COLUMN nombre_unaccented VARCHAR(255);
+
+
+
+ALTER TABLE mpio_politico
+    ADD COLUMN dpto_nombre_unaccented VARCHAR(255);
