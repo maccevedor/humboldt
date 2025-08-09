@@ -29,6 +29,8 @@ services:
       context: ./visor-geografico-I2D-backend
       dockerfile: Dockerfile
     container_name: visor_i2d_backend
+    env_file:
+      - ./visor-geografico-I2D-backend/.env
     command: >
       sh -c "pip install unidecode &&
              python manage.py collectstatic --noinput &&
@@ -39,17 +41,9 @@ services:
     volumes:
       - ./visor-geografico-I2D-backend:/project
       - ./visor-geografico-I2D-backend/secret.json:/project/secret.json
+      - ./visor-geografico-I2D-backend/.env:/project/.env:ro
       - static_volume:/app/static
       - media_volume:/app/media
-    environment:
-      - DEBUG=0
-      - DB_HOST=db
-      - DB_NAME=i2d_db
-      - DB_USER=i2d_user
-      - DB_PASSWORD=i2d_password
-      - DB_PORT=5432
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,0.0.0.0
-      - SECRET_KEY=your-secret-key-here-change-in-production
     depends_on:
       db:
         condition: service_healthy
