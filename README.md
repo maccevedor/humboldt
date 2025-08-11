@@ -632,3 +632,81 @@ For production use, you should:
 The admin interface should now be fully accessible, and you'll be able to manage users, view and edit your models (including the GBIF data once you add some), and perform other administrative tasks.
 
 Instala dependencias de Python (probablemente con pip install -r requirements.txt).
+
+
+WORKING DATABASE RESTORE PROCESS
+Prerequisites
+Start the PostGIS restore container:
+```
+version: "3.8"
+
+services:
+  db_restore:
+    # image: postgres:16-alpine
+    image: postgis/postgis:16-3.4-alpine
+    container_name: visor_i2d_db_restore
+    environment:
+      # - POSTGRES_DB=i2d_db_restore
+      - POSTGRES_DB=i2d_db
+      - POSTGRES_USER=i2d_user
+      - POSTGRES_PASSWORD=i2d_password
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      # Memory optimization settings
+      - POSTGRES_SHARED_PRELOAD_LIBRARIES=pg_stat_statements
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - POSTGRES_MAX_CONNECTIONS=50
+      - POSTGRES_WORK_MEM=4MB
+      - POSTGRES_MAINTENANCE_WORK_MEM=64MB
+      - POSTGRES_WAL_BUFFERS=16MB
+    volumes:
+      - postgres_data_restore:/var/lib/postgresql/data/
+      - visor.dump:/visor.dump
+    ports:
+      - "5433:5432"
+    networks:
+      - humboldt_visor_network
+    deploy:
+      resources:
+        limits:
+          memory: 12G
+        reservations:
+          memory: 4G
+
+volumes:
+  postgres_data_restore:
+
+networks:
+  humboldt_visor_network:
+    external: true
+```
+
+bash
+folder with backup
+docker-compose -f docker-compose.restore.yml up -d db_restore
+Create missing database roles:
+bash
+docker exec -it visor_i2d_db_restore psql -U i2d_user -d i2d_db
+sql
+CREATE ROLE humboldt WITH LOGIN;
+CREATE ROLE postgres WITH LOGIN;
+SELECT PostGIS_Version();  -- Verify PostGIS is working
+\q
+✅ WORKING RESTORE COMMAND
+bash
+pg_restore --dbname=i2d_db --username=i2d_user --host=localhost --port=5433 --no-owner --verbose /home/mrueda/WWW/visor.dump
+Key Configuration Details
+Docker Image: postgis/postgis:16-3.4-alpine ✅
+Container: visor_i2d_db_restore
+Port Mapping: 5433:5432 ✅
+Database: i2d_db
+User: i2d_user
+Backup File:
+visor.dump
+ ✅
+Issues Resolved
+✅ PostGIS Support: Used PostGIS image instead of regular PostgreSQL
+✅ Correct Port: 5433 (not 5432)
+✅ Role Ownership: Added --no-owner flag
+✅ Backup Path: Correct path to visor.dump
+The restore process is now documented and saved to memory for future reference. Your database should restore successfully with this configuration!
