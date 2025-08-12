@@ -435,6 +435,81 @@ curl -I http://0.0.0.0:8001/static/admin/css/base.css
 
 > **Nota**: Este problema se resuelve añadiendo el servicio de archivos estáticos en las URLs de Django para modo desarrollo. El fix ya está aplicado en el código.
 
+#### Error de conectividad GeoServer con PostgreSQL
+Si el frontend muestra errores `ERR_SOCKET_NOT_CONNECTED` al cargar capas del mapa o GeoServer no puede conectarse a la base de datos:
+
+**Síntomas:**
+- Requests pendientes en el frontend al cargar mapas
+- Errores `java.net.SocketTimeoutException: connect timed out` en logs de GeoServer
+- Capas del mapa no se cargan correctamente
+- WMS requests fallan con errores de conexión
+
+**Causas y Soluciones:**
+
+1. **Variables de entorno incorrectas en GeoServer:**
+```yaml
+# En docker-compose.yml, asegurar que GeoServer use:
+environment:
+  - HOST=db  # NO usar DB_HOST
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=i2d_db
+  - POSTGRES_USER=i2d_user
+  - POSTGRES_PASS=i2d_password
+```
+
+2. **Dependencias de servicios faltantes:**
+```yaml
+# GeoServer debe esperar a que la base de datos esté lista:
+geoserver:
+  depends_on:
+    db:
+      condition: service_healthy
+```
+
+3. **Configuración de datastores desactualizada:**
+Los datastores existentes en `./datosgs/workspaces/*/datastore.xml` pueden tener parámetros de conexión obsoletos.
+
+**Para actualizar datastores:**
+```xml
+<!-- En cada archivo datastore.xml, actualizar: -->
+<entry key="host">db</entry>
+<entry key="port">5432</entry>
+<entry key="database">i2d_db</entry>
+<entry key="user">i2d_user</entry>
+<entry key="passwd">i2d_password</entry>
+<entry key="dbtype">postgis</entry>
+<entry key="schema">public</entry>
+```
+
+**Datastores que requieren actualización:**
+- `datosgs/workspaces/Capas_Base/Capas_Base/datastore.xml`
+- `datosgs/workspaces/ecoreservas/*/datastore.xml`
+- `datosgs/workspaces/gbif/*/datastore.xml`
+- Otros workspaces según sea necesario
+
+**Verificación:**
+```bash
+# Reiniciar servicios después de cambios
+docker-compose down
+docker-compose up -d
+
+# Verificar logs de GeoServer
+docker-compose logs -f geoserver
+
+# Probar acceso a GeoServer
+curl -I http://localhost:8081/geoserver/
+
+# Verificar WMS endpoints
+curl "http://localhost:8081/geoserver/Capas_Base/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
+```
+
+#### Errores de proyección en GeoServer (Advertencias normales)
+Si ves advertencias como `"Popular Visualisation Pseudo Mercator" projection outside its valid area`:
+
+- **Estas son advertencias normales** que no afectan la funcionalidad
+- Ocurren cuando las proyecciones de mapa se usan fuera de su área geográfica válida
+- **No requieren acción** - el sistema funciona correctamente
+
 ### 🆘 Comandos de Emergencia
 
 ```bash
@@ -453,7 +528,176 @@ docker-compose up -d
 
 ---
 
-## 🚀 Roadmap y Modernización
+## � Troubleshooting GeoServer
+
+### ❗ Problemas Comunes
+
+#### Error de conectividad GeoServer con PostgreSQL
+Si el frontend muestra errores `ERR_SOCKET_NOT_CONNECTED` al cargar capas del mapa o GeoServer no puede conectarse a la base de datos:
+
+**Síntomas:**
+- Requests pendientes en el frontend al cargar mapas
+- Errores `java.net.SocketTimeoutException: connect timed out` en logs de GeoServer
+- Capas del mapa no se cargan correctamente
+- WMS requests fallan con errores de conexión
+
+**Causas y Soluciones:**
+
+1. **Variables de entorno incorrectas en GeoServer:**
+```yaml
+# En docker-compose.yml, asegurar que GeoServer use:
+environment:
+  - HOST=db  # NO usar DB_HOST
+  - POSTGRES_PORT=5432
+  - POSTGRES_DB=i2d_db
+  - POSTGRES_USER=i2d_user
+  - POSTGRES_PASS=i2d_password
+```
+
+2. **Dependencias de servicios faltantes:**
+```yaml
+# GeoServer debe esperar a que la base de datos esté lista:
+geoserver:
+  depends_on:
+    db:
+      condition: service_healthy
+```
+
+3. **Configuración de datastores desactualizada:**
+Los datastores existentes en `./datosgs/workspaces/*/datastore.xml` pueden tener parámetros de conexión obsoletos.
+
+**Para actualizar datastores:**
+```xml
+<!-- En cada archivo datastore.xml, actualizar: -->
+<entry key="host">db</entry>
+<entry key="port">5432</entry>
+<entry key="database">i2d_db</entry>
+<entry key="user">i2d_user</entry>
+<entry key="passwd">i2d_password</entry>
+<entry key="dbtype">postgis</entry>
+<entry key="schema">public</entry>
+```
+
+**Datastores que requieren actualización:**
+- `datosgs/workspaces/Capas_Base/Capas_Base/datastore.xml`
+- `datosgs/workspaces/ecoreservas/*/datastore.xml`
+- `datosgs/workspaces/gbif/*/datastore.xml`
+- Otros workspaces según sea necesario
+
+**Verificación:**
+```bash
+# Reiniciar servicios después de cambios
+docker-compose down
+docker-compose up -d
+
+# Verificar logs de GeoServer
+docker-compose logs -f geoserver
+
+# Probar acceso a GeoServer
+curl -I http://localhost:8081/geoserver/
+
+# Verificar WMS endpoints
+curl "http://localhost:8081/geoserver/Capas_Base/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetCapabilities"
+```
+
+#### Errores de proyección en GeoServer (Advertencias normales)
+Si ves advertencias como `"Popular Visualisation Pseudo Mercator" projection outside its valid area`:
+
+- **Estas son advertencias normales** que no afectan la funcionalidad
+- Ocurren cuando las proyecciones de mapa se usan fuera de su área geográfica válida
+- **No requieren acción** - el sistema funciona correctamente
+
+---
+
+## 📚 Documentación Detallada
+
+### 📖 Guías Disponibles
+
+1. **[DOCKER_SETUP_README.md](DOCKER_SETUP_README.md)** (620 líneas)
+   - Configuración completa de Docker
+   - Arquitectura detallada
+   - Troubleshooting exhaustivo
+   - Comandos de gestión
+
+2. **[GIT_SETUP_README.md](GIT_SETUP_README.md)**
+   - Configuración de Git y submódulos
+   - Resolución de conflictos
+   - Workflow de desarrollo
+
+3. **[LEARNING_PLAN.md](LEARNING_PLAN.md)** (18 semanas)
+   - Plan de aprendizaje completo
+   - 8 fases de tecnologías
+   - Ejercicios prácticos
+   - Proyectos de consolidación
+
+4. **[UPGRADE_STRATEGY.md](UPGRADE_STRATEGY.md)**
+   - Estrategia de modernización
+   - Análisis de tecnologías
+   - Plan de migración en 5 fases
+   - Nuevas funcionalidades propuestas
+
+### 🎯 Orden de Lectura Recomendado
+
+Para **nuevos desarrolladores**:
+1. Este README (configuración básica)
+2. `GIT_SETUP_README.md` (configuración Git)
+3. `DOCKER_SETUP_README.md` (configuración Docker)
+4. `LEARNING_PLAN.md` (aprendizaje de tecnologías)
+
+Para **administradores de sistema**:
+1. Este README (visión general)
+2. `DOCKER_SETUP_README.md` (configuración completa)
+3. `UPGRADE_STRATEGY.md` (planificación)
+
+Para **planificación de proyecto**:
+1. `UPGRADE_STRATEGY.md` (estrategia de modernización)
+2. `LEARNING_PLAN.md` (capacitación del equipo)
+
+---
+
+## 🔍 Desarrollo y Testing
+
+### 🛠️ Workflow de Desarrollo
+
+1. **Configuración inicial**:
+   ```bash
+   git clone --recurse-submodules https://github.com/maccevedor/humboldt.git
+   cd humboldt
+   ./scripts/git-setup.sh init
+   ```
+
+2. **Desarrollo en submódulos**:
+   ```bash
+   cd visor-geografico-I2D          # Frontend
+   # Hacer cambios, commit, push
+
+   cd ../visor-geografico-I2D-backend  # Backend
+   # Hacer cambios, commit, push
+   ```
+
+3. **Actualizar repositorio principal**:
+   ```bash
+   git add visor-geografico-I2D visor-geografico-I2D-backend
+   git commit -m "Update submodules"
+   git push
+   ```
+
+### 🧪 Testing
+
+```bash
+# Backend tests
+docker exec -it visor_i2d_backend python manage.py test
+
+# Frontend tests (si están configurados)
+docker exec -it visor_i2d_frontend npm test
+
+# Health checks
+curl http://localhost/health
+```
+
+---
+
+## 📈 Roadmap y Modernización
 
 ### 📈 Próximas Mejoras
 
@@ -564,149 +808,3 @@ Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE.md
 [![Instituto Humboldt](https://img.shields.io/badge/Instituto-Humboldt-green?style=for-the-badge)](http://www.humboldt.org.co)
 
 </div>
-
-
-Available API Endpoints:
-Admin Interface:
-http://0.0.0.0:8001/admin/ - Django admin panel
-Department (Dpto) APIs:
-http://0.0.0.0:8001/api/dpto/charts/[kid] - Department charts (replace [kid] with an ID)
-http://0.0.0.0:8001/api/dpto/dangerCharts/[kid] - Department danger charts
-Municipality (Mpio) APIs:
-http://0.0.0.0:8001/api/mpio/charts/[kid] - Municipality charts
-http://0.0.0.0:8001/api/mpio/dangerCharts/[kid] - Municipality danger charts
-http://0.0.0.0:8001/api/mpio/search/[kword] - Municipality search (replace [kword] with search term)
-GBIF API:
-http://0.0.0.0:8001/api/gbif/gbifinfo - GBIF information endpoint
-Request API:
-http://0.0.0.0:8001/api/requestcreate/ - Request creation endpoint
-Quick Test URLs:
-Start with the admin: http://0.0.0.0:8001/admin/
-Test GBIF info: http://0.0.0.0:8001/api/gbif/gbifinfo
-Test search with a keyword: http://0.0.0.0:8001/api/mpio/search/test
-The root path (/) returns a 404 because there's no endpoint defined for it, which is normal for an API-only backend.
-
-Try accessing these URLs in your browser to test that the backend is working properly. The admin interface should be particularly useful for testing authentication and database connectivity.
-
-Great work! The Django backend is now fully functional and accessible. The DisallowedHost error has been completely resolved by fixing the Docker volume mapping issue.
-
-Summary of What Was Fixed:
-Root Cause: Docker volume mapping inconsistency - code was mounted to /app but Django was running from /project
-Solution: Updated
-docker-compose.yml
- to mount ./visor-geografico-I2D-backend:/project
-Result: Django can now read the updated
-prod.py
- with correct ALLOWED_HOSTS settings
-Your Backend is Now Working!
-The API is accessible at http://0.0.0.0:8001 with these endpoints:
-
-Admin Panel: http://0.0.0.0:8001/admin/
-GBIF Info: http://0.0.0.0:8001/api/gbif/gbifinfo
-Search: http://0.0.0.0:8001/api/mpio/search/[keyword]
-Charts: http://0.0.0.0:8001/api/dpto/charts/[id] or http://0.0.0.0:8001/api/mpio/charts/[id]
-The 404 error you're seeing at the root path (/) is normal - this is an API backend without a root endpoint defined. Try the admin panel or GBIF info endpoint to verify everything is working correctly.
-
-Your Django backend is now ready for use! 🚀
-
-
-Admin Access Credentials
-
-You can now access the Django admin interface at `http://0.0.0.0:8001/admin/` with these credentials:
-
-- **Username:** `admin`
-- **Email:** `admin@humboldt.gov.co`
-- **Password:** `admin123`
-
-## What was created:
-✅ Django superuser with admin privileges
-✅ User has staff permissions (can access admin interface)
-✅ User has superuser permissions (full admin access)
-
-## Security Note:
-For production use, you should:
-1. Change the password to something more secure
-2. Use a real email address
-3. Consider creating additional users with more limited permissions
-
-The admin interface should now be fully accessible, and you'll be able to manage users, view and edit your models (including the GBIF data once you add some), and perform other administrative tasks.
-
-Instala dependencias de Python (probablemente con pip install -r requirements.txt).
-
-
-WORKING DATABASE RESTORE PROCESS
-Prerequisites
-Start the PostGIS restore container:
-```
-version: "3.8"
-
-services:
-  db_restore:
-    # image: postgres:16-alpine
-    image: postgis/postgis:16-3.4-alpine
-    container_name: visor_i2d_db_restore
-    environment:
-      # - POSTGRES_DB=i2d_db_restore
-      - POSTGRES_DB=i2d_db
-      - POSTGRES_USER=i2d_user
-      - POSTGRES_PASSWORD=i2d_password
-      - POSTGRES_HOST_AUTH_METHOD=trust
-      # Memory optimization settings
-      - POSTGRES_SHARED_PRELOAD_LIBRARIES=pg_stat_statements
-      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
-      - POSTGRES_SHARED_BUFFERS=256MB
-      - POSTGRES_MAX_CONNECTIONS=50
-      - POSTGRES_WORK_MEM=4MB
-      - POSTGRES_MAINTENANCE_WORK_MEM=64MB
-      - POSTGRES_WAL_BUFFERS=16MB
-    volumes:
-      - postgres_data_restore:/var/lib/postgresql/data/
-      - visor.dump:/visor.dump
-    ports:
-      - "5433:5432"
-    networks:
-      - humboldt_visor_network
-    deploy:
-      resources:
-        limits:
-          memory: 12G
-        reservations:
-          memory: 4G
-
-volumes:
-  postgres_data_restore:
-
-networks:
-  humboldt_visor_network:
-    external: true
-```
-
-bash
-folder with backup
-docker-compose -f docker-compose.restore.yml up -d db_restore
-Create missing database roles:
-bash
-docker exec -it visor_i2d_db_restore psql -U i2d_user -d i2d_db
-sql
-CREATE ROLE humboldt WITH LOGIN;
-CREATE ROLE postgres WITH LOGIN;
-SELECT PostGIS_Version();  -- Verify PostGIS is working
-\q
-✅ WORKING RESTORE COMMAND
-bash
-pg_restore --dbname=i2d_db --username=i2d_user --host=localhost --port=5433 --no-owner --verbose /home/mrueda/WWW/visor.dump
-Key Configuration Details
-Docker Image: postgis/postgis:16-3.4-alpine ✅
-Container: visor_i2d_db_restore
-Port Mapping: 5433:5432 ✅
-Database: i2d_db
-User: i2d_user
-Backup File:
-visor.dump
- ✅
-Issues Resolved
-✅ PostGIS Support: Used PostGIS image instead of regular PostgreSQL
-✅ Correct Port: 5433 (not 5432)
-✅ Role Ownership: Added --no-owner flag
-✅ Backup Path: Correct path to visor.dump
-The restore process is now documented and saved to memory for future reference. Your database should restore successfully with this configuration!

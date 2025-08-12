@@ -10,10 +10,16 @@ services:
       - POSTGRES_USER=i2d_user
       - POSTGRES_PASSWORD=i2d_password
       - POSTGRES_HOST_AUTH_METHOD=trust
+      # PostGIS optimization settings
+      - POSTGRES_SHARED_PRELOAD_LIBRARIES=postgis
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=1GB
+      - POSTGRES_SHARED_BUFFERS=256MB
+      - POSTGRES_MAX_CONNECTIONS=100
     volumes:
       # - postgres_data:/var/lib/postgresql/data/
       - postgres_data_restore:/var/lib/postgresql/data/
-      # - ./scripts/init-db-schema.sql:/docker-entrypoint-initdb.d/init-db.sql
+      # Initialize PostGIS extensions if needed
+      - ./scripts/init-postgis.sql:/docker-entrypoint-initdb.d/01-init-postgis.sql:ro
     ports:
       - "5432:5432"
     networks:
@@ -66,6 +72,7 @@ services:
     ports:
       - "8080:80"
       - "1234:1234"
+      - "1235:1235"
     volumes:
       # - ./visor-geografico-I2D/build:/usr/local/apache2/htdocs/
       - ./visor-geografico-I2D:/home/node/app
@@ -107,15 +114,32 @@ services:
       retries: 3
 
   geoserver:
-    image: oscarfonts/geoserver:latest
+    image: kartoza/geoserver:2.18.0
     container_name: geoserver
     ports:
       - "8081:8080"
-    environment:
-      - GEOSERVER_ADMIN_PASSWORD=geoserver
     volumes:
-      - geoserver_data:/var/geoserver_data
       - ./datosgs:/var/lib/geoserver_data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: curl --fail -s http://localhost:8081/ || exit 1
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+    restart: always
+    environment:
+      - EXISTING_DATA_DIR=true
+      - DB_BACKEND=POSTGRES
+      - HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=i2d_db
+      - POSTGRES_USER=i2d_user
+      - POSTGRES_PASS=i2d_password
+      - GEOSERVER_DATA_DIR=/var/lib/geoserver_data
+      - GEOSERVER_ADMIN_PASSWORD=geoserver
     networks:
       - visor_network
 
