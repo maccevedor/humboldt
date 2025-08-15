@@ -607,6 +607,27 @@ Si ves advertencias como `"Popular Visualisation Pseudo Mercator" projection out
 - Ocurren cuando las proyecciones de mapa se usan fuera de su área geográfica válida
 - **No requieren acción** - el sistema funciona correctamente
 
+#### Problemas con el login
+
+Si no puedes acceder al panel de administración del geoserver:
+
+```bash
+# Stop GeoServer container
+docker-compose stop geoserver
+
+# Backup current security configuration
+cp -r ./datosgs/security ./datosgs/security.backup
+
+# Remove the existing security configuration to force reset
+rm -rf ./datosgs/security
+
+# Start GeoServer - it will create new security with your environment password
+docker-compose up -d geoserver
+
+# Wait for GeoServer to fully start (check logs)
+docker-compose logs -f geoserver
+```
+
 ---
 
 ## 📚 Documentación Detallada
