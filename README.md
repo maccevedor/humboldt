@@ -231,12 +231,40 @@ docker exec -it visor_i2d_backend python manage.py createsuperuser
 | **Frontend Directo** | http://localhost:8080 | Aplicación frontend |
 | **Backend Directo** | http://localhost:8001 | API REST |
 
-### 🔑 Credenciales por Defecto
+### 🔑 Credenciales Django Admin
+- **URL**: `http://localhost:8001/admin/`
 - **Usuario**: `admin`
-- **Email**: `admin@humboldt.gov.co`
+- **Email**: `admin@example.com`
 - **Contraseña**: `admin123`
 
 > **Nota de Seguridad**: Para uso en producción, cambia estas credenciales por defecto y usa contraseñas más seguras.
+
+#### 🔄 Resetear Contraseña de Admin
+
+Si necesitas resetear la contraseña del administrador Django:
+
+```bash
+# Método 1: Usando Django management command
+docker exec -it visor_i2d_backend python manage.py changepassword admin
+
+# Método 2: Usando Django shell
+docker exec -i visor_i2d_backend python manage.py shell -c "from django.contrib.auth.models import User; u = User.objects.get(username='admin'); u.set_password('nueva_contraseña'); u.save(); print('Password updated successfully')"
+
+# Método 3: Crear nuevo superusuario
+docker exec -it visor_i2d_backend python manage.py createsuperuser
+```
+
+#### 🆕 Crear Usuario Admin (si no existe)
+
+Si no hay usuarios administradores en el sistema:
+
+```bash
+# Crear superusuario automáticamente
+docker exec -i visor_i2d_backend python manage.py createsuperuser --noinput --username admin --email admin@example.com
+
+# Establecer contraseña
+docker exec -i visor_i2d_backend python manage.py shell -c "from django.contrib.auth.models import User; u = User.objects.get(username='admin'); u.set_password('admin123'); u.save(); print('Admin user created successfully')"
+```
 
 ### 📡 APIs y Endpoints
 | Endpoint | Descripción |
