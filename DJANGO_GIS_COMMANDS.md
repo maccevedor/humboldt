@@ -8,8 +8,9 @@
 docker exec visor_i2d_backend env | grep DB_ENGINE
 # Expected: DB_ENGINE=django.contrib.gis.db.backends.postgis
 
-# Run verification script
-docker exec visor_i2d_backend python /project/verify_django_gis.py
+# Or run from Docker container
+docker exec visor_i2d_backend python /project/tests/verify_django_gis.py
+docker exec visor_i2d_backend python /project/tests/quick_test.py
 ```
 
 ### 2. Test Spatial Operations

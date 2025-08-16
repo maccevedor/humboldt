@@ -54,10 +54,10 @@ python3 ./tests/test_postgis_functions.py
 ### Run Tests from Docker Container
 ```bash
 # Complete test suite
-docker exec visor_i2d_backend python /project/quick_test.py
+docker exec visor_i2d_backend python /project/tests/quick_test.py
 
 # Verification script
-docker exec visor_i2d_backend python /project/verify_django_gis.py
+docker exec visor_i2d_backend python /project/tests/verify_django_gis.py
 ```
 
 ### Run All Tests (Batch)
