@@ -63,7 +63,7 @@ print(f'Geometry operations: {duration:.4f}s')
 
 ### Initial Setup
 ```bash
-cd /home/mrueda/WWW/humboldt
+# Run from project root directory
 docker-compose down
 docker-compose build --no-cache backend
 docker-compose up -d

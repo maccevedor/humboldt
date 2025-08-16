@@ -7,9 +7,7 @@ This guide provides complete instructions for setting up, verifying, and trouble
 
 ### 1. Initial Setup
 ```bash
-# Navigate to project directory
-cd /home/mrueda/WWW/humboldt
-
+# Navigate to project root directory
 # Stop containers
 docker-compose down
 
@@ -222,7 +220,7 @@ docker exec visor_i2d_db psql -U i2d_user -d i2d_db -c "SELECT PostGIS_Version()
 **Solution**: Always run Django commands from within the container:
 ```bash
 # Wrong
-python3 /home/mrueda/WWW/humboldt/tests/test_django_gis.py
+python3 ./tests/test_django_gis.py
 
 # Correct
 docker exec visor_i2d_backend python /project/../tests/test_django_gis.py
@@ -276,7 +274,7 @@ print('Departments with geometry:', DptoQueries.objects.filter(geom__isnull=Fals
 - ✅ Spatial operations working (area, centroid, geometry types)
 
 ### Test Suite Results
-When running `/home/mrueda/WWW/humboldt/tests/run_all_tests.sh`, expect:
+When running `./tests/run_all_tests.sh`, expect:
 - ✅ Django GIS Integration: PASSED
 - ✅ Spatial Performance: PASSED
 - ✅ PostGIS Functions: PASSED
@@ -320,7 +318,7 @@ AND attname = 'geom';
 ### Regular Checks
 ```bash
 # Weekly health check
-/home/mrueda/WWW/humboldt/tests/run_all_tests.sh
+./tests/run_all_tests.sh
 
 # Monitor spatial index usage
 docker exec visor_i2d_db psql -U i2d_user -d i2d_db -c "

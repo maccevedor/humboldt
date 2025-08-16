@@ -39,7 +39,7 @@ Este plan te guiará paso a paso para aprender todas las tecnologías utilizadas
 **Práctica con el Proyecto:**
 ```bash
 # Explorar la estructura HTML del proyecto
-cd /home/mrueda/WWW/humboldt/visor-geografico-I2D/src
+cd ./visor-geografico-I2D/src
 code index.html
 
 # Analizar los estilos SCSS
@@ -63,7 +63,7 @@ code sizes.scss  # Revisar mixins responsivos
 **Práctica con el Proyecto:**
 ```bash
 # Explorar el JavaScript del proyecto
-cd /home/mrueda/WWW/humboldt/visor-geografico-I2D/src
+cd ./visor-geografico-I2D/src
 code index.js
 cd components/
 ls -la  # Revisar componentes JavaScript
@@ -88,7 +88,7 @@ node --version  # Debe ser 15.3.0+
 npm --version
 
 # Clonar y configurar el proyecto frontend
-cd /home/mrueda/WWW/humboldt/
+# Run from project root directory
 git clone https://github.com/PEM-Humboldt/visor-geografico-I2D.git
 cd visor-geografico-I2D/
 
@@ -191,7 +191,7 @@ python3 --version  # Debe ser 3.9.2+
 pip3 --version
 
 # Crear entorno virtual
-cd /home/mrueda/WWW/humboldt/
+# Run from project root directory
 python3 -m venv venv-visor
 source venv-visor/bin/activate
 

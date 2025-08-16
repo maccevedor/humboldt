@@ -30,7 +30,7 @@ PostGIS-specific function tests:
 ### Prerequisites
 Ensure Docker containers are running:
 ```bash
-cd /home/mrueda/WWW/humboldt
+# Run from project root directory
 docker-compose up -d
 ```
 
