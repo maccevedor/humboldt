@@ -1,0 +1,40 @@
+Django GIS Test Suite Report
+Generated: Sat Aug 16 05:34:04 AM -05 2025
+Host: maccevedor
+
+========================
+TEST: Django GIS Integration
+FILE: /project/../tests/test_django_gis.py
+TIME: Sat Aug 16 05:34:04 AM -05 2025
+========================
+python: can't open file '/project/../tests/test_django_gis.py': [Errno 2] No such file or directory
+
+RESULT: FAILED (exit code: 2)
+
+========================
+TEST: Spatial Performance
+FILE: /project/../tests/test_spatial_performance.py
+TIME: Sat Aug 16 05:34:04 AM -05 2025
+========================
+python: can't open file '/project/../tests/test_spatial_performance.py': [Errno 2] No such file or directory
+
+RESULT: FAILED (exit code: 2)
+
+========================
+TEST: PostGIS Functions
+FILE: /project/../tests/test_postgis_functions.py
+TIME: Sat Aug 16 05:34:04 AM -05 2025
+========================
+python: can't open file '/project/../tests/test_postgis_functions.py': [Errno 2] No such file or directory
+
+RESULT: FAILED (exit code: 2)
+
+
+===============================================
+FINAL SUMMARY
+===============================================
+Total tests: 3
+Passed: 0
+Failed: 3
+Success rate: 0%
+Report generated: Sat Aug 16 05:34:04 AM -05 2025

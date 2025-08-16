@@ -38,6 +38,8 @@ services:
     container_name: visor_i2d_backend
     env_file:
       - ./visor-geografico-I2D-backend/.env
+    environment:
+      - DB_ENGINE=django.contrib.gis.db.backends.postgis
     command: >
       sh -c "pip install unidecode &&
              python manage.py collectstatic --noinput &&
