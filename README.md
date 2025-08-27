@@ -635,6 +635,56 @@ Si ves advertencias como `"Popular Visualisation Pseudo Mercator" projection out
 - Ocurren cuando las proyecciones de mapa se usan fuera de su área geográfica válida
 - **No requieren acción** - el sistema funciona correctamente
 
+#### Error de configuración de entorno en desarrollo (Frontend)
+Si el frontend muestra errores `ERR_NAME_NOT_RESOLVED` intentando conectar a servidores de prueba inexistentes como `test-geoserver.humboldt.org.co`:
+
+**Síntomas:**
+- Console logs muestran errores `Failed to load resource: net::ERR_NAME_NOT_RESOLVED`
+- Requests a URLs como `https://test-geoserver.humboldt.org.co/geoserver/`
+- Capas del mapa no cargan desde el GeoServer local
+- Frontend intenta conectar a servidores de prueba en lugar del entorno local
+
+**Causa:**
+El `DockerfileDev` estaba configurado para usar siempre el archivo `.env.test` en lugar del archivo `.env` personalizado del desarrollador.
+
+**Solución aplicada:**
+1. **Actualizar DockerfileDev** para usar el archivo `.env` personalizado:
+   ```dockerfile
+   # Antes (problemático):
+   COPY .env.test /home/node/app/.env
+   CMD ["npm", "run", "dev:test"]
+   
+   # Después (corregido):
+   COPY .env /home/node/app/.env
+   CMD ["npm", "run", "dev"]
+   ```
+
+2. **Configurar el archivo `.env` para desarrollo local:**
+   ```bash
+   NODE_ENV=development
+   GEOSERVER_URL=http://localhost:8081/geoserver/
+   PYTHONSERVER=http://localhost:8001/
+   ```
+
+3. **Reconstruir y reiniciar el contenedor frontend:**
+   ```bash
+   docker-compose build frontend
+   docker-compose down && docker-compose up -d
+   ```
+
+**Verificación:**
+```bash
+# Verificar que el frontend usa el comando correcto
+docker logs visor_i2d_frontend --tail 5
+# Debe mostrar: "npm run dev" (no "npm run dev:test")
+
+# Verificar que las URLs apuntan al entorno local
+curl http://localhost:1234/
+# El frontend debe cargar mapas desde localhost:8081
+```
+
+**Nota importante:** Este fix asegura que el entorno de desarrollo use las configuraciones locales en lugar de los servidores de prueba remotos, permitiendo el desarrollo completamente offline.
+
 #### Problemas con el login
 
 Si no puedes acceder al panel de administración del geoserver:
