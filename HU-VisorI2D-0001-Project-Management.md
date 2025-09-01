@@ -303,8 +303,40 @@ curl http://localhost:8001/api/projects/1/layer_groups/
 - ✅ Requests WMS exitosos con nombres de capas válidos
 - ✅ Sincronización completa entre base de datos y GeoServer
 
+### Layer Configuration Fixes (Septiembre 1, 2025)
+
+**Problema Identificado:**
+- Frontend mostraba 9 grupos de capas (hardcodeados) pero API solo retornaba 4 grupos
+- Capas GEF Páramos tenían workspace incorrecto (`Historicos` en lugar de `gefparamos`)
+- Base de datos contenía capas que no existían en GeoServer
+
+**Solución Implementada:**
+1. **Agregados 6 grupos de capas faltantes:**
+   - Capas Base, División político-administrativa, Proyecto Oleoducto Bicentenario
+   - Gobernanza, Restauración, GEF Páramos
+
+2. **Corregidas configuraciones de workspace:**
+   - `paramo` layer: `Historicos` → `gefparamos`
+   - `municipio` layer: `Historicos` → `gefparamos`
+
+3. **Limpieza de base de datos:**
+   - Removidas 8 capas no existentes en GeoServer
+   - Removidos 4 grupos vacíos después de limpieza
+
+**Scripts Utilizados:**
+- `docs/add_missing_general_layer_groups.sql` - Script SQL para agregar grupos faltantes
+- `docs/add_missing_layers.py` - Script Python Django ORM para gestión de capas
+- `docs/layer_configuration_fixes.md` - Documentación completa de cambios
+
+**Estado Final:**
+- ✅ API retorna 5 grupos de capas válidos para proyecto general
+- ✅ Todas las capas tienen workspace correcto en GeoServer
+- ✅ Frontend carga dinámicamente sin fallback a capas hardcodeadas
+- ✅ Requests WMS exitosos para todas las capas
+
 ---
 
-**Fecha de Implementación:** Agosto 2025  
+**Fecha de Implementación:** Agosto-Septiembre 2025  
 **Estado:** ✅ PRODUCCIÓN - Completamente funcional  
+**Branch:** `manager_projects` - Todos los cambios committeados  
 **Desarrollador:** Sistema de gestión dinámico de proyectos Visor I2D
