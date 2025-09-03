@@ -19,7 +19,7 @@ VALUES ('Proyecto Oleoducto Bicentenario', 5, 'close', NULL, 1, NOW(), NOW());
 
 -- 4. Add Gobernanza layer group
 INSERT INTO layer_groups (nombre, orden, fold_state, parent_group_id, proyecto_id, created_at, updated_at)
-VALUES ('Gobernanza', 6, 'close', NULL, 1, NOW(), NOW());
+VALUES ('Gobernanza', 4, 'close', NULL, 1, NOW(), NOW());
 
 -- 5. Add Restauración layer group
 INSERT INTO layer_groups (nombre, orden, fold_state, parent_group_id, proyecto_id, created_at, updated_at)
@@ -45,13 +45,13 @@ WHERE lg.nombre = 'División político-administrativa' AND lg.proyecto_id = 1;
 
 -- Add Proyecto Oleoducto Bicentenario layer
 INSERT INTO layers (nombre_geoserver, nombre_display, store_geoserver, estado_inicial, metadata_id, orden, grupo_id, created_at, updated_at)
-SELECT 'coberturas_bo_2009_2010', 'Cobertura Bo', 'Historicos', false, '008150a7-4ee9-488a-9ac0-354d678b4b8e', 1, lg.id, NOW(), NOW()
+SELECT 'coberturas_bo_2009_2010', 'Cobertura Bo', 'Proyecto_oleoducto_bicentenario', false, '008150a7-4ee9-488a-9ac0-354d678b4b8e', 1, lg.id, NOW(), NOW()
 FROM layer_groups lg 
 WHERE lg.nombre = 'Proyecto Oleoducto Bicentenario' AND lg.proyecto_id = 1;
 
 -- Add Gobernanza layer
 INSERT INTO layers (nombre_geoserver, nombre_display, store_geoserver, estado_inicial, metadata_id, orden, grupo_id, created_at, updated_at)
-SELECT 'procesos_gobernanza', 'Posibles procesos de gobernanza', 'Historicos', false, 'a6fcfe1b-11e8-4383-a38e-a7f0035dece5', 1, lg.id, NOW(), NOW()
+SELECT 'procesos_gobernanza', 'Posibles procesos de gobernanza', 'Gobernanza', false, 'a6fcfe1b-11e8-4383-a38e-a7f0035dece5', 1, lg.id, NOW(), NOW()
 FROM layer_groups lg 
 WHERE lg.nombre = 'Gobernanza' AND lg.proyecto_id = 1;
 
