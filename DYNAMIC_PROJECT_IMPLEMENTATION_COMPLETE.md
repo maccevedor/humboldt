@@ -171,6 +171,62 @@ CREATE TABLE default_layers (
 }
 ```
 
+## 🗃️ SQL Inserts and Maintenance Scripts
+
+To bootstrap and keep project data consistent without code changes, we maintain a set of idempotent SQL scripts and a documented fix log.
+
+### Authoritative scripts and docs
+- `visor-geografico-I2D-backend/docs/add_missing_general_layer_groups.sql`
+  - Adds missing layer groups and layers for the `general` project.
+  - Uses schema-qualified Django tables and includes verification queries.
+- `scripts/fix_ecoreservas_layer_names.sql`
+  - Normalizes layer names for the `ecoreservas` project.
+- `visor-geografico-I2D-backend/docs/layer_configuration_fixes.md`
+  - Runbook documenting concrete fixes (e.g., Restauración workspaces and layer corrections) with copy-paste SQL.
+
+### New table confirmation
+The new `default_layers` table is present and enforced by a unique constraint on `(proyecto_id, layer_id)`.
+
+```sql
+-- Confirm tables exist (output should list all four under schema 'django')
+SELECT table_schema, table_name
+FROM information_schema.tables
+WHERE table_schema='django' AND table_name IN ('projects','layer_groups','layers','default_layers')
+ORDER BY table_name;
+```
+
+### How to run on the test server
+
+Replace connection details as appropriate for the test server and run the scripts in this order:
+
+```bash
+# 1) Add missing layer groups and layers for 'general'
+psql "postgresql://i2d_user:i2d_password@localhost:5432/i2d_db" -f visor-geografico-I2D-backend/docs/add_missing_general_layer_groups.sql
+
+# 2) Apply ecoreservas name fixes
+psql "postgresql://i2d_user:i2d_password@localhost:5432/i2d_db" -f scripts/fix_ecoreservas_layer_names.sql
+
+# 3) Apply targeted fixes from the runbook (e.g., Restauración workspace mapping)
+# See: visor-geografico-I2D-backend/docs/layer_configuration_fixes.md
+```
+
+### Quick verification commands
+
+```bash
+# API: list layer groups and sizes for 'general'
+curl -s http://localhost:8001/api/projects/1/layer_groups/ \
+  | jq -r '.[] | "\(.nombre): \(.layers | length) layers"'
+
+# DB: verify Restauración mapping matches production
+psql "postgresql://i2d_user:i2d_password@localhost:5432/i2d_db" -c "
+SELECT l.nombre_display, l.store_geoserver || ':' || l.nombre_geoserver AS layer
+FROM django.layers l
+JOIN django.layer_groups lg ON lg.id=l.grupo_id
+JOIN django.projects p ON p.id=lg.proyecto_id
+WHERE p.nombre_corto='general' AND lg.nombre='Restauración'
+ORDER BY l.orden;"
+```
+
 ## 🧪 Testing
 
 ### Unit Tests Created
