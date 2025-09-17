@@ -21,11 +21,11 @@ run_test() {
     local test_name="$1"
     local test_command="$2"
     local expected_pattern="$3"
-    
+
     echo -n "Testing: $test_name... "
-    
+
     result=$(eval "$test_command" 2>/dev/null)
-    
+
     if [[ -n "$expected_pattern" && "$result" =~ $expected_pattern ]] || [[ -z "$expected_pattern" && $? -eq 0 ]]; then
         echo -e "${GREEN}✅ PASSED${NC}"
         ((TESTS_PASSED++))
@@ -88,17 +88,17 @@ run_test "Frontend Health Check" \
 
 # Test 9: Check if project service file exists
 run_test "Project Service File" \
-    "test -f /home/mrueda/WWW/humboldt/visor-geografico-I2D/src/components/services/projectService.js && echo 'exists'" \
+    "test -f ../visor-geografico-I2D/src/components/services/projectService.js && echo 'exists'" \
     "exists"
 
 # Test 10: Check if dynamic layers file exists
 run_test "Dynamic Layers File" \
-    "test -f /home/mrueda/WWW/humboldt/visor-geografico-I2D/src/components/mapComponent/dynamicLayers.js && echo 'exists'" \
+    "test -f ../visor-geografico-I2D/src/components/mapComponent/dynamicLayers.js && echo 'exists'" \
     "exists"
 
 # Test 11: Check if unit tests exist
 run_test "Unit Tests Files" \
-    "test -f /home/mrueda/WWW/humboldt/visor-geografico-I2D/tests/projectService.test.js && echo 'exists'" \
+    "test -f ../visor-geografico-I2D/tests/projectService.test.js && echo 'exists'" \
     "exists"
 
 echo -e "\n${YELLOW}4. Integration Tests${NC}"
