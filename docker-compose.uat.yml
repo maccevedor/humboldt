@@ -36,11 +36,19 @@ services:
       context: ./visor-geografico-I2D-backend
       dockerfile: Dockerfile.prod
     container_name: visor_i2d_backend_uat
-    env_file:
-      - ./visor-geografico-I2D-backend/.env
     environment:
+      # Database Configuration
+      - DB_NAME=i2d_db
+      - DB_USER=i2d_user
+      - DB_PASSWORD=${DB_PASSWORD:-i2d_password}
+      - DB_HOST=db
+      - DB_PORT=5432
       - DB_ENGINE=django.contrib.gis.db.backends.postgis
+      # Django Configuration
       - DJANGO_SETTINGS_MODULE=i2dbackend.settings.prod
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-%%%c!c4yrt250j9-)@b2*g+kw$$%!&dbd*x7d0eulv9u$$!b&f3d}
+      - DEBUG=False
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-localhost,127.0.0.1,0.0.0.0}
       - PYTHONUNBUFFERED=1
     command: >
       sh -c "pip install unidecode &&
@@ -50,8 +58,6 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - ./visor-geografico-I2D-backend/secret.json:/project/secret.json:ro
-      - ./visor-geografico-I2D-backend/.env:/project/.env:ro
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
