@@ -54,14 +54,6 @@ class Layer(models.Model):
     orden = models.IntegerField(default=0)                  # Orden de visualización
 ```
 
-**4. DefaultLayer (Capas por Defecto)**
-```python
-class DefaultLayer(models.Model):
-    proyecto = models.ForeignKey(Project, related_name='default_layers')
-    layer = models.ForeignKey(Layer)
-    visible_inicial = models.BooleanField(default=True)
-```
-
 #### API Endpoints
 
 | Endpoint | Método | Descripción |
@@ -71,7 +63,6 @@ class DefaultLayer(models.Model):
 | `/api/projects/by-name/{nombre_corto}/` | GET | Proyecto por nombre corto |
 | `/api/projects/{id}/layer_groups/` | GET | Grupos de capas de un proyecto |
 | `/api/projects/{id}/layers/` | GET | Todas las capas de un proyecto |
-| `/api/projects/{id}/default_layers/` | GET | Capas por defecto de un proyecto |
 
 ### Frontend (JavaScript/ES6)
 
@@ -102,9 +93,12 @@ const organizedLayers = projectService.getOrganizedLayers()
 
 **Refactorización de selectLayers:**
 - ✅ Eliminadas condiciones hardcodeadas (`if projectType === 'general'`)
-- ✅ Implementada selección dinámica basada en `project.layer_groups`
-- ✅ Mapeo automático de nombres de grupos a objetos de capas
-- ✅ Compatibilidad hacia atrás mantenida para proyectos legacy
+- ✅ Implementada selección dinámica basada en configuración de API
+
+**Modelos Implementados:**
+- `Project`: Configuración de proyectos (zoom, centro, logos, etc.)
+- `LayerGroup`: Grupos jerárquicos de capas
+- `Layer`: Capas individuales con configuración WMS
 
 ## Criterios de Aceptación
 
@@ -118,7 +112,6 @@ const organizedLayers = projectService.getOrganizedLayers()
 - [x] **nivel_zoom** - Nivel de zoom inicial
 - [x] **coordenada_central_x/y** - Coordenadas del centro del mapa
 - [x] **grupos_capas** - Relación con LayerGroup
-- [x] **capas_iniciales** - Relación con DefaultLayer
 
 ### ✅ Campos de Grupo/Subgrupo Implementados
 
@@ -180,7 +173,6 @@ const organizedLayers = projectService.getOrganizedLayers()
             "subgroups": []
         }
     ],
-    "default_layers": [],
     "created_at": "2025-08-28T09:56:44.724483Z",
     "updated_at": "2025-08-28T09:56:44.724501Z"
 }
