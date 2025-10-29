@@ -40,6 +40,8 @@ services:
       - ./visor-geografico-I2D-backend/.env
     environment:
       - DB_ENGINE=django.contrib.gis.db.backends.postgis
+      - ENVIRONMENT=development
+      - DEBUG=true
     command: >
       sh -c "pip install unidecode &&
              python manage.py collectstatic --noinput &&
