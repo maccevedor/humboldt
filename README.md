@@ -925,6 +925,56 @@ curl "http://localhost:8081/geoserver/Capas_Base/wms?SERVICE=WMS&VERSION=1.3.0&R
 
 ---
 
+## 📚 Documentación
+
+La documentación completa del proyecto está organizada en el directorio `/docs/`:
+
+### 📖 [Índice de Documentación](./docs/INDEX.md)
+
+Consulta el índice completo para acceder a toda la documentación disponible.
+
+### Categorías Principales:
+
+#### 🚀 [Setup - Configuración Inicial](./docs/setup/)
+- Guías de configuración Docker, Git, Django GIS
+- Mejores prácticas de configuración
+
+#### 📖 [Guides - Guías de Uso](./docs/guides/)
+- Comandos Django GIS
+- Guía de migraciones
+- Instrucciones de testing
+
+#### 🔧 [Implementation - Implementaciones](./docs/implementation/)
+- Sistema de proyectos dinámicos
+- Capas jerárquicas
+- Refactorizaciones importantes
+
+#### 📊 [Reports - Informes Técnicos](./docs/reports/)
+- Informe técnico del backend
+- Informe técnico del frontend
+- Informe consolidado de cambios
+
+#### 💻 [Dev - Desarrollo](./docs/dev/)
+- Resúmenes de proyecto
+- Pull requests
+- Estrategias de actualización
+
+#### 🧪 [UAT - User Acceptance Testing](./docs/uat/)
+- Guías de despliegue UAT
+- Quick start UAT
+
+### 🛠️ [Scripts de Utilidad](./scripts/README.md)
+
+Todos los scripts de utilidad (shell, SQL, Python) están organizados en `/scripts/`:
+- Scripts de configuración y setup
+- Scripts de despliegue
+- Scripts de testing
+- Scripts de mantenimiento
+- Scripts SQL de datos
+- Scripts Python de utilidades
+
+---
+
 ## 📄 Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para detalles.

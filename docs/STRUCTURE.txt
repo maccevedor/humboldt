@@ -1,0 +1,175 @@
+VISOR I2D - ESTRUCTURA DE DOCUMENTACIÓN Y SCRIPTS
+=================================================
+
+📁 /home/mrueda/WWW/humboldt/
+│
+├── 📄 README.md (actualizado con enlaces a documentación)
+├── 📄 DOCUMENTATION_ORGANIZATION_SUMMARY.md (resumen de cambios)
+│
+├── 📁 docs/ ────────────────────────────────────────────────────────
+│   │
+│   ├── 📄 INDEX.md (índice completo de documentación)
+│   ├── 📄 STRUCTURE.txt (este archivo)
+│   │
+│   ├── 📁 setup/ (Configuración Inicial - 4 archivos)
+│   │   ├── CONFIGURATION_BEST_PRACTICES.md
+│   │   ├── DJANGO_GIS_SETUP.md
+│   │   ├── DOCKER_SETUP_README.md
+│   │   └── GIT_SETUP_README.md
+│   │
+│   ├── 📁 guides/ (Guías de Uso - 4 archivos)
+│   │   ├── DJANGO_GIS_COMMANDS.md
+│   │   ├── DJANGO_MIGRATIONS_GUIDE.md
+│   │   ├── LEARNING_PLAN.md
+│   │   └── TESTING_INSTRUCTIONS.md
+│   │
+│   ├── 📁 implementation/ (Implementaciones - 5 archivos)
+│   │   ├── DEFAULTLAYER_REMOVAL_SUMMARY.md
+│   │   ├── DYNAMIC_PROJECT_IMPLEMENTATION_COMPLETE.md
+│   │   ├── FINAL_IMPLEMENTATION_SUMMARY.md
+│   │   ├── HIERARCHICAL_LAYERS_IMPLEMENTATION_SUMMARY.md
+│   │   └── REMOVE_HARDCODED_ECORESERVAS.md
+│   │
+│   ├── 📁 reports/ (Informes Técnicos - 3 archivos)
+│   │   ├── INFORME_BACKEND_VISOR_I2D.md
+│   │   ├── INFORME_FRONTEND_VISOR_I2D.md
+│   │   └── INFORME_TECNICO_CAMBIOS_VISOR_I2D.md
+│   │
+│   ├── 📁 dev/ (Desarrollo - 8 archivos)
+│   │   ├── CLAUDE.md
+│   │   ├── commit_info.md
+│   │   ├── CONSOLIDATED_PROJECT_SUMMARY.md
+│   │   ├── FRONTEND_PR_SUMMARY.md
+│   │   ├── HU-VisorI2D-0001-Project-Management.md
+│   │   ├── PR_DESCRIPTION_FRONTEND.md
+│   │   ├── PROJECT_MANAGEMENT_STATUS.md
+│   │   └── UPGRADE_STRATEGY.md
+│   │
+│   ├── 📁 uat/ (User Acceptance Testing - 3 archivos)
+│   │   ├── QUICK_START_UAT.md
+│   │   ├── UAT_DEPLOYMENT_GUIDE.md
+│   │   └── UAT_SETUP_SUMMARY.md
+│   │
+│   └── 📁 prod/ (Producción - vacío)
+│
+├── 📁 scripts/ ─────────────────────────────────────────────────────
+│   │
+│   ├── 📄 README.md (documentación completa de scripts)
+│   │
+│   ├── 🔧 Shell Scripts (8 archivos)
+│   │   ├── db-setup.sh
+│   │   ├── deploy.sh
+│   │   ├── deploy-uat.sh
+│   │   ├── fix_migration.sh
+│   │   ├── git-setup.sh
+│   │   ├── run_backend_tests_docker.sh
+│   │   ├── test_dynamic_projects.sh
+│   │   └── user.sh
+│   │
+│   ├── 🗄️ SQL Scripts (5 archivos)
+│   │   ├── add_missing_general_layer_groups.sql
+│   │   ├── fix_ecoreservas_layer_names.sql
+│   │   ├── init-db-schema.sql
+│   │   ├── init-postgis.sql
+│   │   └── update_ecoreservas_colors.sql
+│   │
+│   ├── 🐍 Python Scripts (4 archivos)
+│   │   ├── add_missing_layers.py
+│   │   ├── create_ecoreservas_layers.py
+│   │   ├── test_django_gis.py
+│   │   └── verify_django_gis.py
+│   │
+│   ├── 📁 data_backups/ (Backups SQL)
+│   │   ├── default_layers_data.sql
+│   │   ├── layer_groups_data.sql
+│   │   ├── layers_data.sql
+│   │   └── projects_data.sql
+│   │
+│   └── 📁 migrations/ (Scripts de migración)
+│       └── 0002_restauracion_data_fix.py
+│
+├── 📁 tests/ (Tests del proyecto)
+├── 📁 nginx/ (Configuración Nginx)
+├── 📁 datosgs/ (Datos GeoServer)
+├── 📁 screenshots/ (Capturas de pantalla)
+├── 📁 visor-geografico-I2D/ (Submódulo frontend)
+└── 📁 visor-geografico-I2D-backend/ (Submódulo backend)
+
+
+RESUMEN DE ORGANIZACIÓN
+========================
+
+✅ Documentación Organizada:
+   - 28 archivos .md en /docs/
+   - 7 categorías temáticas
+   - Índice completo creado
+   - README principal actualizado
+
+✅ Scripts Organizados:
+   - 8 scripts shell (.sh)
+   - 5 scripts SQL (.sql)
+   - 4 scripts Python (.py)
+   - README de scripts creado
+   - Subdirectorios para backups y migraciones
+
+✅ Directorio Raíz Limpio:
+   - Solo README.md y resumen de organización
+   - Toda documentación en /docs/
+   - Todos los scripts en /scripts/
+   - Estructura clara y mantenible
+
+
+ACCESO RÁPIDO
+=============
+
+📖 Documentación Principal:
+   → /docs/INDEX.md
+
+🛠️ Scripts:
+   → /scripts/README.md
+
+🚀 Setup Inicial:
+   → /docs/setup/
+
+📚 Guías:
+   → /docs/guides/
+
+🔧 Implementaciones:
+   → /docs/implementation/
+
+📊 Informes:
+   → /docs/reports/
+
+💻 Desarrollo:
+   → /docs/dev/
+
+🧪 UAT:
+   → /docs/uat/
+
+
+ESTADÍSTICAS
+============
+
+Total archivos organizados: 47
+├── Documentación: 28 archivos
+└── Scripts: 19 archivos
+
+Categorías creadas: 7
+├── setup/
+├── guides/
+├── implementation/
+├── reports/
+├── dev/
+├── uat/
+└── prod/
+
+Duplicados eliminados: 1
+
+
+FECHA DE ORGANIZACIÓN
+=====================
+2025-10-30
+
+
+Instituto Alexander von Humboldt Colombia
+Programa de Evaluación y Monitoreo de la Biodiversidad

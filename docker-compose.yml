@@ -6,9 +6,9 @@ services:
     image: postgis/postgis:16-3.4-alpine
     container_name: visor_i2d_db
     environment:
-      - POSTGRES_DB=i2d_db
-      - POSTGRES_USER=i2d_user
-      - POSTGRES_PASSWORD=i2d_password
+      - POSTGRES_DB=${DB_NAME:-i2d_db}
+      - POSTGRES_USER=${DB_USER:-i2d_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-i2d_password}
       - POSTGRES_HOST_AUTH_METHOD=trust
       # PostGIS optimization settings
       - POSTGRES_SHARED_PRELOAD_LIBRARIES=postgis
@@ -73,21 +73,18 @@ services:
       dockerfile: DockerfileDev
       target: dev
     container_name: visor_i2d_frontend
+    env_file:
+      - ./visor-geografico-I2D/.env  # Single source of configuration
     ports:
       - "8080:80"
       - "1234:1234"
       - "1235:1235"
     volumes:
-      # - ./visor-geografico-I2D/build:/usr/local/apache2/htdocs/
       - ./visor-geografico-I2D:/home/node/app
     depends_on:
       - backend
     networks:
       - visor_network
-    environment:
-      # - BACKEND_URL=http://backend:8001
-      - NODE_ENV=development
-      - PYTHONSERVER=http://localhost:8001/api/
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1234/"]
       interval: 30s
