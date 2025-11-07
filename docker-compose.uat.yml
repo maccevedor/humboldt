@@ -58,6 +58,7 @@ services:
     ports:
       - "8001:8001"
     volumes:
+      - ./visor-geografico-I2D-backend/secret.json:/project/secret.json:ro
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
